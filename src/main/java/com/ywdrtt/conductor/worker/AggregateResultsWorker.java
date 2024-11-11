@@ -41,7 +41,7 @@ public class AggregateResultsWorker implements Worker {
 
 		// Example of accessing data from the Wrapper object
 		int totalItems = (int) wrapperData.get("totalItems");
-		System.out.println("Wrapper totalItems: " + totalItems);
+//		System.out.println("Wrapper totalItems: " + totalItems);
 		totalItems += totalItemCount;
 		wrapperData.put("totalItems", totalItems);
 
@@ -49,9 +49,11 @@ public class AggregateResultsWorker implements Worker {
 		TaskResult result = new TaskResult(task);
 		result.setStatus(TaskResult.Status.COMPLETED);
 
+		
+		System.out.println("summary :Aggregation complete for " + items.size() + " items. Total Count For all Items :" + totalItems);
 		// Set output data if needed (e.g., aggregated summary)
 		result.getOutputData().put("summary",
-				"Aggregation complete for " + items.size() + " items. Total Count For all Items :" + totalItemCount);
+				"Aggregation complete for " + items.size() + " items. Total Count For all Items :" + totalItems);
 
 		result.getOutputData().put("wrapperData", wrapperData);
 

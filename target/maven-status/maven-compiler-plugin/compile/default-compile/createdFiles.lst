@@ -1,8 +1,9 @@
 com\ywdrtt\conductor\model\Wrapper.class
 com\ywdrtt\conductor\WorkflowRunner.class
 com\ywdrtt\conductor\model\Item.class
-com\ywdrtt\conductor\service\WorkflowService.class
+com\ywdrtt\conductor\config\workflow\FileSubmissionWorkFlow.class
 com\ywdrtt\conductor\config\ConductorWorkerConfig.class
 com\ywdrtt\conductor\ConductorApplication.class
 com\ywdrtt\conductor\worker\AggregateResultsWorker.class
+com\ywdrtt\conductor\service\FileSubmissionWorkflowService.class
 com\ywdrtt\conductor\worker\ProcessItemWorker.class
