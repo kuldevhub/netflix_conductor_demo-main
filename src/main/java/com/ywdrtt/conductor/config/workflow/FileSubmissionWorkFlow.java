@@ -1,43 +1,69 @@
 package com.ywdrtt.conductor.config.workflow;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import com.netflix.conductor.client.http.MetadataClient;
+import com.netflix.conductor.common.metadata.tasks.TaskDef;
 import com.netflix.conductor.common.metadata.tasks.TaskType;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
 import com.netflix.conductor.common.metadata.workflow.WorkflowTask;
 import com.ywdrtt.conductor.model.Item;
+import com.ywdrtt.conductor.model.Wrapper;
 
-@Configuration
+@Component
 public class FileSubmissionWorkFlow {
+	@Autowired
+	private MetadataClient metadataClient;
 
-	private final MetadataClient metadataClient;
-	public FileSubmissionWorkFlow(MetadataClient metadataClient) {
-		this.metadataClient = metadataClient;
-	}
-	
-//	@Bean
-//	public String workflowName() {
-//	    return "demo_fork_join";
+//	public FileSubmissionWorkFlow(MetadataClient metadataClient) {
+//		this.metadataClient = metadataClient;
 //	}
-	
-	@Bean
-	public WorkflowDef fileSubmissionWorkflowDef(@Value("${workflow.file-submission.name}") String workflowName, @Value("${version}") int version) {
 
+	public WorkflowDef fileSubmissionWorkflowDef(String workflowName, int version, Map<String, Object> inputData) {
 		// Create workflow definition
 		WorkflowDef workflowDef = new WorkflowDef();
 		workflowDef.setName(workflowName);
 		workflowDef.setVersion(version);
 		workflowDef.setDescription("A simple workflow that lists the items in wrapper java object");
+//		workflowDef.setTimeoutSeconds(120);
+		workflowDef.setOwnerEmail("test@test.com");
+		// Initialize Task Definition with required properties
+//		TaskDef processItemTaskDef = new TaskDef();
+//		processItemTaskDef.setName("process_item_task");
+//		processItemTaskDef.setTimeoutSeconds(120);        // Task timeout
+//		processItemTaskDef.setRetryDelaySeconds(10);      // Delay between retries
+//		processItemTaskDef.setRetryCount(3);              // Number of retries
+
+		// Register TaskDef with Conductor
+//		WorkflowClient workflowClient = new WorkflowClient();
+//		workflowClient.registerTaskDefs(List.of(processItemTaskDef));
+		/*
+		 * Once the task definition is registered with process_item_task name, can
+		 * reference it in your workflow definition:
+		 */
+		
+		TaskDef processItemTaskDef = new TaskDef();
+		processItemTaskDef.setName("process_item_task");
+		processItemTaskDef.setDescription("Task to process each item dynamically");
+		processItemTaskDef.setTimeoutSeconds(120);          // Timeout for task execution
+		processItemTaskDef.setRetryCount(3);                // Number of retries
+		processItemTaskDef.setRetryDelaySeconds(10);        // Delay between retries
+		processItemTaskDef.setResponseTimeoutSeconds(60);   // Time within which response is expected
+		processItemTaskDef.setOwnerEmail("Test@test.com");
+      // Register task definition
+      metadataClient.registerTaskDefs(List.of(processItemTaskDef));
+
+      System.out.println("process_item_task has been registered successfully.");
+		
+		
+		
 
 		List<WorkflowTask> workflowTasks = new ArrayList<>();
 
@@ -52,7 +78,7 @@ public class FileSubmissionWorkFlow {
 		// List to hold tasks that run in parallel
 		List<List<WorkflowTask>> forkedTasks = new ArrayList<>();
 
-		List<Item> items = getItemsToProcess();
+		List<Item> items = getItemsToProcess(inputData);
 
 		for (int i = 0; i < items.size(); i++) {
 			WorkflowTask processTask = new WorkflowTask();
@@ -65,6 +91,8 @@ public class FileSubmissionWorkFlow {
 
 			processTask
 					.setInputParameters(Collections.singletonMap("item", "${workflow.input.wrapper.items[" + i + "]}"));
+
+			processTask.setRetryCount(3);
 
 			// Each task list here represents a parallel task
 			forkedTasks.add(Collections.singletonList(processTask));
@@ -119,12 +147,9 @@ public class FileSubmissionWorkFlow {
 
 	}
 
-	private List<Item> getItemsToProcess() {
-		List<Item> itemList = Arrays.asList(new Item("book", 5, "processing", 50),
-				new Item("computer", 2, "processing", 500), new Item("phone", 4, "processing", 700));
-
-		return itemList;
+	private List<Item> getItemsToProcess(Map<String, Object> inputData) {
+		Wrapper wrapper = (Wrapper) inputData.get("wrapper");
+		return wrapper.getItems();
 	}
-
 
 }

@@ -1,0 +1,39 @@
+{
+  "name": "dynamic_fork_join_workflow6",
+  "description": "A workflow to process items dynamically using a fork-join pattern",
+  "version": 1,
+  "tasks": [
+    {
+      "name": "dynamic_fork",
+      "taskReferenceName": "fork_task",
+      "type": "FORK_JOIN_DYNAMIC",
+      "inputParameters": {
+        "dynamicTasks": "${workflow.input.dynamicTasks}",
+        "dynamicTasksInput": "${workflow.input.dynamicTasksInput}"
+      },
+      "dynamicForkTasksParam": "dynamicTasks",
+      "dynamicForkTasksInputParamName": "dynamicTasksInput"
+    },
+    {
+      "name": "join_task",
+      "taskReferenceName": "join_task",
+      "type": "JOIN",
+      "joinOn": [
+        "fork_task"
+      ]
+    },
+    {
+      "name": "aggregate_results",
+      "taskReferenceName": "aggregate_results",
+      "type": "SIMPLE",
+      "inputParameters": {
+        "items": "${join_task.output}",
+        "wrapper": "${workflow.input.wrapper}"
+      }
+    }
+  ],
+  "outputParameters": {
+    "finalWrapper": "${aggregate_results.output.wrapper}"
+  },
+  "schemaVersion": 2
+}

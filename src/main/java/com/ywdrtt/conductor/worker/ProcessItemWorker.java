@@ -1,5 +1,6 @@
 package com.ywdrtt.conductor.worker;
 
+import java.util.Base64;
 import java.util.Map;
 
 import org.springframework.stereotype.Component;
@@ -26,9 +27,12 @@ public class ProcessItemWorker implements Worker {
 		String name = (String) itemData.get("name");
 		String status = (String) itemData.get("status");
 		int count = (int) itemData.get("count");
+//		byte[] fileBytes = (byte[]) itemData.get("fileBytes");
+		String fileBytesBase64 = (String) itemData.get("fileBytes");
+		byte[] fileBytes = Base64.getDecoder().decode(fileBytesBase64);
 		
 		// Process the item (For example, print it or perform some operation)
-		System.out.println("Processing item: " + name + " with status: " + status + " and count: " + count);
+		System.out.println("Processing item: " + name + " with status: " + status + " and count: " + count+" file Size "+ fileBytes.length);
 
 		count += 2;
 		

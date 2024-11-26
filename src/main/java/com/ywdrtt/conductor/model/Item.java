@@ -6,17 +6,27 @@ public class Item {
 	private int count;
 	private String status;
 	private int cost;
+	private byte[] fileBytes;  // New property
 	
-	  // Default constructor (required for Jackson to deserialize)
+	  public byte[] getFileBytes() {
+		return fileBytes;
+	}
+
+	public void setFileBytes(byte[] fileBytes) {
+		this.fileBytes = fileBytes;
+	}
+
+	// Default constructor (required for Jackson to deserialize)
     public Item() {
     }
     
-	public Item(String name, int count, String status, int cost) {
+	public Item(String name, int count, String status, int cost, byte[] fileBytes) {
 		// TODO Auto-generated constructor stub
 		this.name = name;
 		this.count = count;
 		this.status = status;
 		this.cost = cost;
+		this.fileBytes = fileBytes;
 	}
 	public String getName() {
 		return name;

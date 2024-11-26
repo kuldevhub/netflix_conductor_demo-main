@@ -49,12 +49,6 @@ public class ConductorWorkerConfig {
         		.build();
         this.taskRunnerConfigurer.init(); // Starts polling for tasks
         return this.taskRunnerConfigurer;
-
-//		this.taskRunnerConfigurer =  new TaskRunnerConfigurer.Builder(taskClient, workers).withThreadCount(1) // You can adjust the number of
-//																						// threads as needed
-//				.build();
-//		 this.taskRunnerConfigurer.init(); // Starts polling for tasks
-//		 return this.taskRunnerConfigurer;
 	}
 
 	@PreDestroy

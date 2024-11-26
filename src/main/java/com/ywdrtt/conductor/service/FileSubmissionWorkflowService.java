@@ -1,7 +1,5 @@
 package com.ywdrtt.conductor.service;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,21 +9,24 @@ import com.netflix.conductor.client.http.MetadataClient;
 import com.netflix.conductor.client.http.WorkflowClient;
 import com.netflix.conductor.common.metadata.workflow.StartWorkflowRequest;
 import com.netflix.conductor.common.metadata.workflow.WorkflowDef;
-import com.ywdrtt.conductor.model.Item;
-import com.ywdrtt.conductor.model.Wrapper;
+import com.ywdrtt.conductor.config.workflow.FileSubmissionWorkFlow;
 
 @Service
 public class FileSubmissionWorkflowService {
 
 	private final MetadataClient metadataClient;
 	private final WorkflowClient workflowClient;
-	private final WorkflowDef fileSubmissionWorkflowDef;
+//	private final WorkflowDef fileSubmissionWorkflowDef;
+	
+	@Autowired
+	FileSubmissionWorkFlow fileSubmissionWorkFlow;
 
 	@Autowired
-	public FileSubmissionWorkflowService(WorkflowClient workflowClient, WorkflowDef fileSubmissionWorkflowDef,
+	public FileSubmissionWorkflowService(WorkflowClient workflowClient, 
+//			WorkflowDef fileSubmissionWorkflowDef,
 			MetadataClient metadataClient) {
 		this.workflowClient = workflowClient;
-		this.fileSubmissionWorkflowDef = fileSubmissionWorkflowDef;
+//		this.fileSubmissionWorkflowDef = fileSubmissionWorkflowDef;
 		this.metadataClient = metadataClient;
 	}
 
@@ -37,8 +38,8 @@ public class FileSubmissionWorkflowService {
 		// Register the workflow definition with Conductor if not already registered
 		WorkflowDef existingDef = getWorkflowDefinition(workflowName, version);
 		if (existingDef == null) {
-			metadataClient.registerWorkflowDef(fileSubmissionWorkflowDef);
-			System.out.println("Workflow registered: " + fileSubmissionWorkflowDef.getName());
+			metadataClient.registerWorkflowDef(fileSubmissionWorkFlow.fileSubmissionWorkflowDef(workflowName, version, inputData));
+			System.out.println("Workflow registered: " + workflowName);
 		} else {
 			System.out.println("Workflow already registered: " + existingDef.getName());
 		}
